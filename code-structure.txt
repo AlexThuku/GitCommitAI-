@@ -1,0 +1,23 @@
+git-msg/
+├── cmd/
+│   └── git-msg/
+│       └── main.go
+├── internal/
+│   ├── config/
+│   │   └── config.go
+│   ├── git/
+│   │   └── diff.go
+│   ├── ai/
+│   │   ├── openai.go
+│   │   ├── local.go
+│   │   └── provider.go
+│   └── cli/
+│       └── ui.go
+├── pkg/
+│   └── commit/
+│       └── format.go
+├── .gitignore
+├── go.mod
+├── go.sum
+├── config.yaml
+└── README.md

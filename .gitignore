@@ -1,0 +1,46 @@
+# Go binaries and build artifacts
+gitscribe
+*.out
+*.test
+
+# Configuration and secrets
+config.yaml
+config.toml
+config.json
+*.env
+secrets/
+credentials/
+
+# Python/FastAPI backend (if applicable)
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+Pipfile.lock
+
+# Logs and temp files
+*.log
+logs/
+*.tmp
+*.swp
+
+# Editor/OS-specific
+.idea/
+.vscode/
+*.sublime-project
+.DS_Store
+Thumbs.db
+
+# Testing artifacts
+coverage.txt
+profile.cov
+*.prof
+
+# Distribution artifacts
+dist/
+build/
+*.deb
+*.rpm
+*.tar.gz
