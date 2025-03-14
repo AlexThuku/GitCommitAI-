@@ -1,168 +1,85 @@
-GitCommitAI is an AI-powered command-line tool written in Go that generates meaningful Git commit messages by analyzing your latest changes (git diff). It supports both OpenAI’s GPT API and locally hosted models, adheres to the Conventional Commits format, and offers an interactive workflow to review or edit suggestions before committing.
-Features
-AI-Driven: Generates context-aware commit messages using OpenAI’s GPT or a local model via FastAPI.
+# AI-Powered Git Commit Message Generator
 
-Conventional Commits: Suggests messages like feat: add login endpoint or fix: resolve bug in parser.
+Welcome to the AI-Powered Git Commit Message Generator! This tool leverages advanced AI models to generate meaningful and conventional commit messages based on your code changes. Whether you're using OpenAI, Hugging Face, or a local model, this tool aims to streamline your commit process and improve your commit history.
 
-Interactive: Review, edit, or accept AI-generated messages with a smooth CLI experience.
+## Features
 
-Fast & Portable: Built in Go for performance and single-binary distribution.
+- **AI-Driven Commit Messages**: Automatically generate commit messages using AI models.
+- **Multiple AI Providers**: Supports OpenAI, Hugging Face, and local models.
+- **Customizable Configuration**: Easily switch between AI providers and configure settings.
+- **Interactive Approval**: Review, edit, or reject suggested commit messages before committing.
 
-Configurable: Supports YAML/JSON/TOML configuration for API keys, model selection, and more.
+## Getting Started
 
-Extensible: Modular design with robust error handling and logging.
+### Installation
 
-Installation
-Prerequisites
-Go 1.21+ (for building from source)
+1. **Clone the Repository**:
+   ```bash
+   git clone git@github.com:AlexThuku/GitCommitAI-.git
+   cd ai-git-commit-generator
+   ```
 
-Git (any recent version)
+2. **Build the Project**:
+   ```bash
+   go build -o git-msg cmd/git-msg/main.go
+   ```
 
-Optional: Python 3.9+ and FastAPI (for local model support)
+3. **Set Up Configuration**:
+   Create a `git-msg.yaml` file in your home directory or current directory with the following content:
+   ```yaml
+   model_provider: "huggingface" # or "openai", "local"
+   huggingface_token: "your_huggingface_token_here"
+   huggingface_model: "mistralai/Mistral-7B-Instruct-v0.2"
+   openai_api_key: "your_openai_api_key_here"
+   openai_model: "gpt-4o"
+   local_endpoint: "http://localhost:8000/generate"
+   ```
 
-Via Homebrew (macOS)
-bash
+### Usage
 
-brew tap AlexThuku/GitCommitAI-
-brew install GitCommitAI-
+1. **Navigate to Your Git Repository**:
+   ```bash
+   cd path/to/your/repo
+   ```
 
-Via Linux Package
-For Debian/Ubuntu:
-bash
+2. **Stage Your Changes**:
+   ```bash
+   git add .
+   ```
 
-wget https://github.com/AlexThuku/GitCommitAI-/releases/latest/download/GitCommitAI-.deb
-sudo dpkg -i GitCommitAI-.deb
+3. **Generate a Commit Message**:
+   ```bash
+   ../path/to/git-msg generate
+   ```
 
-For Fedora/RHEL:
-bash
+4. **Review and Approve**:
+   - Accept, edit, or reject the suggested commit message.
 
-wget https://github.com/AlexThuku/GitCommitAI-/releases/latest/download/GitCommitAI-.rpm
-sudo rpm -i GitCommitAI-.rpm
+### Environment Variables
 
-From Source
-bash
+Instead of using a configuration file, you can set environment variables:
 
-git clone https://github.com/AlexThuku/GitCommitAI-.git
-cd GitCommitAI-
-go build -o GitCommitAI- ./cmd/GitCommitAI-
-sudo mv GitCommitAI- /usr/local/bin/
+```bash
+export OPENAI_API_KEY="your_openai_api_key_here"
+export HUGGINGFACE_TOKEN="your_huggingface_token_here"
+```
 
-Binary Download
-Grab the latest pre-built binary from the Releases page and move it to your PATH (e.g., /usr/local/bin/).
-Usage
-Basic Command
-Generate a commit message for your staged changes:
-bash
+## Troubleshooting
 
-GitCommitAI- generate
+- **Configuration Errors**: Ensure your `git-msg.yaml` file is correctly formatted and free of control characters.
+- **API Errors**: Verify your API keys and model IDs are correct and have the necessary permissions.
+- **Model Selection**: Experiment with different models if the output isn't as expected.
 
-Example output:
+## Contributing
 
-Analyzing changes...
-Suggested commit: "feat: implement user login endpoint"
-[a]ccept, [e]dit, [r]eject?
+Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
-Flags
---model: Choose the AI model (openai or local, default: openai).
 
---edit: Force edit mode for the suggested message.
 
---config: Specify a custom config file (default: ./config.yaml).
+## Contact
 
-Example:
-bash
+For questions or support, please contact alexmwangithuku001@gmail.com.
 
-GitCommitAI- generate --model local --edit
+---
 
-Git Integration
-Stage your changes first:
-bash
-
-git add .
-GitCommitAI- generate
-
-Configuration
-GitCommitAI- uses a configuration file (default: config.yaml) to manage settings. Create one in your project root or home directory:
-Sample config.yaml
-yaml
-
-model:
-  type: "openai"          # or "local"
-  openai:
-    api_key: "your-openai-key-here"
-  local:
-    endpoint: "http://localhost:8000/generate"
-logging:
-  level: "info"           # debug, info, warn, error
-
-OpenAI: Set OPENAI_API_KEY as an environment variable or in the config file.
-
-Local Model: Run a FastAPI server (see Local Model Setup (#local-model-setup)) and point to its endpoint.
-
-Environment Variables
-Override config settings with:
-bash
-
-export OPENAI_API_KEY="your-key"
-export GitCommitAI-_MODEL="local"
-GitCommitAI- generate
-
-Local Model Setup
-For local inference, deploy a Python FastAPI backend:
-Install dependencies:
-bash
-
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install fastapi uvicorn your-ai-model-lib
-
-Start the server:
-bash
-
-uvicorn main:app --host 0.0.0.0 --port 8000
-
-Configure GitCommitAI- to use model.type: local and the correct endpoint.
-
-Project Structure
-
-GitCommitAI-/
-├── cmd/           # CLI entry point
-├── internal/      # Private packages (ai, config, git)
-├── pkg/           # Reusable utilities (optional)
-├── backend/       # Python FastAPI backend (optional)
-├── config.yaml    # Sample config
-├── go.mod         # Go module file
-└── README.md
-
-Contributing
-We welcome contributions! To get started:
-Fork the repo.
-
-Create a feature branch (git checkout -b feat/my-feature).
-
-Commit changes following Conventional Commits.
-
-Submit a pull request.
-
-See CONTRIBUTING.md for details.
-Development
-Run tests:
-bash
-
-go test ./...
-
-Build locally:
-bash
-
-go build -o GitCommitAI- ./cmd/GitCommitAI-
-
-License
-MIT License (LICENSE) - feel free to use, modify, and distribute.
-Acknowledgements
-Built with Go, OpenAI, and FastAPI.
-
-Inspired by tools like aicommits and OpenCommit.
-
-Contact
-Questions? Open an issue or reach out at alexmwangithuku001@gmail.com
+Thank you for using the AI-Powered Git Commit Message Generator! We hope it enhances your development workflow.
