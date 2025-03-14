@@ -1,10 +1,10 @@
 # Go binaries and build artifacts
-GitCommitAI-
+git-msg
 *.out
 *.test
 
 # Configuration and secrets
-config.yaml
+git-msg.yaml
 config.toml
 config.json
 *.env
