@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/AlexThuku/GitCommitAI-/internal/ai"
+	"github.com/AlexThuku/GitCommitAI-/internal/cli"
+	"github.com/AlexThuku/GitCommitAI-/internal/config"
+	"github.com/AlexThuku/GitCommitAI-/internal/git"
 	"github.com/spf13/cobra"
-	"github.com/yourusername/git-msg/internal/ai"
-	"github.com/yourusername/git-msg/internal/cli"
-	"github.com/yourusername/git-msg/internal/config"
-	"github.com/yourusername/git-msg/internal/git"
 	"golang.org/x/exp/slog"
 )
 
@@ -28,10 +28,16 @@ func main() {
 
 	// Create AI provider based on configuration
 	var provider ai.Provider
-	if cfg.UseLocalModel {
-		provider = ai.NewLocalProvider(cfg.LocalEndpoint)
-	} else {
+	switch cfg.ModelProvider {
+	case "openai":
 		provider = ai.NewOpenAIProvider(cfg.OpenAIAPIKey, cfg.OpenAIModel)
+	case "huggingface":
+		provider = ai.NewHuggingFaceProvider(cfg.HuggingFaceToken, cfg.HuggingFaceModel)
+	case "local":
+		provider = ai.NewLocalProvider(cfg.LocalEndpoint)
+	default:
+		// Default to Hugging Face if not specified
+		provider = ai.NewHuggingFaceProvider(cfg.HuggingFaceToken, cfg.HuggingFaceModel)
 	}
 
 	// Create root command
@@ -65,10 +71,28 @@ func main() {
 			if err != nil {
 				slog.Error("Failed to generate commit message", "error", err)
 
-				// Try fallback if OpenAI provider failed
-				if _, ok := provider.(*ai.OpenAIProvider); ok && cfg.LocalEndpoint != "" {
-					fmt.Println("Falling back to local model...")
-					fallbackProvider := ai.NewLocalProvider(cfg.LocalEndpoint)
+				// Try fallback if primary provider failed
+				var fallbackProvider ai.Provider
+				var fallbackName string
+
+				if _, ok := provider.(*ai.HuggingFaceProvider); ok && cfg.LocalEndpoint != "" {
+					fallbackName = "local model"
+					fallbackProvider = ai.NewLocalProvider(cfg.LocalEndpoint)
+				} else if _, ok := provider.(*ai.LocalProvider); ok && cfg.HuggingFaceToken != "" {
+					fallbackName = "Hugging Face model"
+					fallbackProvider = ai.NewHuggingFaceProvider(cfg.HuggingFaceToken, cfg.HuggingFaceModel)
+				} else if _, ok := provider.(*ai.OpenAIProvider); ok {
+					if cfg.HuggingFaceToken != "" {
+						fallbackName = "Hugging Face model"
+						fallbackProvider = ai.NewHuggingFaceProvider(cfg.HuggingFaceToken, cfg.HuggingFaceModel)
+					} else if cfg.LocalEndpoint != "" {
+						fallbackName = "local model"
+						fallbackProvider = ai.NewLocalProvider(cfg.LocalEndpoint)
+					}
+				}
+
+				if fallbackProvider != nil {
+					fmt.Printf("Falling back to %s...\n", fallbackName)
 					message, err = fallbackProvider.GenerateCommitMessage(diff)
 					if err != nil {
 						slog.Error("Fallback failed", "error", err)

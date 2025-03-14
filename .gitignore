@@ -1,5 +1,5 @@
 # Go binaries and build artifacts
-gitscribe
+GitCommitAI-
 *.out
 *.test
 
